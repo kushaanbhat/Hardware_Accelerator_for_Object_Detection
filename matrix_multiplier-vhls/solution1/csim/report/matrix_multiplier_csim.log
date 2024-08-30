@@ -1,0 +1,109 @@
+INFO: [SIM 2] *************** CSIM start ***************
+INFO: [SIM 4] CSIM will launch GCC as the compiler.
+   Compiling ../../../matrix_multiplier_tb.cpp in debug mode
+   Compiling ../../../matrix_multiplier.cpp in debug mode
+   Generating csim.exe
+Print Matrix A:
+0.00125126	0.563585	0.193304	0.80874	0.585009	0.479873	0.350291	0.895962	0.82284	
+0.563585	0.193304	0.80874	0.585009	0.479873	0.350291	0.895962	0.82284	0.746605	
+0.193304	0.80874	0.585009	0.479873	0.350291	0.895962	0.82284	0.746605	0.174108	
+0.80874	0.585009	0.479873	0.350291	0.895962	0.82284	0.746605	0.174108	0.858943	
+0.585009	0.479873	0.350291	0.895962	0.82284	0.746605	0.174108	0.858943	0.710501	
+0.479873	0.350291	0.895962	0.82284	0.746605	0.174108	0.858943	0.710501	0.513535	
+0.350291	0.895962	0.82284	0.746605	0.174108	0.858943	0.710501	0.513535	0.303995	
+0.895962	0.82284	0.746605	0.174108	0.858943	0.710501	0.513535	0.303995	0.0149846	
+0.82284	0.746605	0.174108	0.858943	0.710501	0.513535	0.303995	0.0149846	0.0914029	
+Print Matrix x:
+0.385235	0.735008	0.608966	0.572405	0.361339	0.151555	0.225105	0.425153	0.802881	
+0.735008	0.608966	0.572405	0.361339	0.151555	0.225105	0.425153	0.802881	0.517106	
+0.608966	0.572405	0.361339	0.151555	0.225105	0.425153	0.802881	0.517106	0.98999	
+0.572405	0.361339	0.151555	0.225105	0.425153	0.802881	0.517106	0.98999	0.751549	
+0.361339	0.151555	0.225105	0.425153	0.802881	0.517106	0.98999	0.751549	0.345561	
+0.151555	0.225105	0.425153	0.802881	0.517106	0.98999	0.751549	0.345561	0.168981	
+0.225105	0.425153	0.802881	0.517106	0.98999	0.751549	0.345561	0.168981	0.657308	
+0.425153	0.802881	0.517106	0.98999	0.751549	0.345561	0.168981	0.657308	0.491897	
+0.802881	0.517106	0.98999	0.751549	0.345561	0.168981	0.657308	0.491897	0.0635395	
+At 0 & at 0 with value y_hw = 2.39989, should be y_sw = 2.39989 And Error = 0
+At 0 & at 1 with value y_hw = 2.56399, should be y_sw = 2.56399 And Error = 0
+At 0 & at 2 with value y_hw = 2.20463, should be y_sw = 2.20463 And Error = 0
+At 0 & at 3 with value y_hw = 2.61444, should be y_sw = 2.61444 And Error = 0
+At 0 & at 4 with value y_hw = 2.68955, should be y_sw = 2.68955 And Error = 0
+At 0 & at 5 with value y_hw = 2.66284, should be y_sw = 2.66284 And Error = 0
+At 0 & at 6 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 0 & at 7 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 0 & at 8 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 1 & at 0 with value y_hw = 2.56399, should be y_sw = 2.56399 And Error = 0
+At 1 & at 1 with value y_hw = 2.20463, should be y_sw = 2.20463 And Error = 0
+At 1 & at 2 with value y_hw = 2.61444, should be y_sw = 2.61444 And Error = 0
+At 1 & at 3 with value y_hw = 2.68955, should be y_sw = 2.68955 And Error = 0
+At 1 & at 4 with value y_hw = 2.66284, should be y_sw = 2.66284 And Error = 0
+At 1 & at 5 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 1 & at 6 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 1 & at 7 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 1 & at 8 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 2 & at 0 with value y_hw = 2.20463, should be y_sw = 2.20463 And Error = 0
+At 2 & at 1 with value y_hw = 2.61444, should be y_sw = 2.61444 And Error = 0
+At 2 & at 2 with value y_hw = 2.68955, should be y_sw = 2.68955 And Error = 0
+At 2 & at 3 with value y_hw = 2.66284, should be y_sw = 2.66284 And Error = 0
+At 2 & at 4 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 2 & at 5 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 2 & at 6 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 2 & at 7 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 2 & at 8 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 3 & at 0 with value y_hw = 2.61444, should be y_sw = 2.61444 And Error = 0
+At 3 & at 1 with value y_hw = 2.68955, should be y_sw = 2.68955 And Error = 0
+At 3 & at 2 with value y_hw = 2.66284, should be y_sw = 2.66284 And Error = 0
+At 3 & at 3 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 3 & at 4 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 3 & at 5 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 3 & at 6 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 3 & at 7 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 3 & at 8 with value y_hw = 1.84693, should be y_sw = 1.91562 And Error = 0.0686938
+At 4 & at 0 with value y_hw = 2.68955, should be y_sw = 2.68955 And Error = 0
+At 4 & at 1 with value y_hw = 2.66284, should be y_sw = 2.66284 And Error = 0
+At 4 & at 2 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 4 & at 3 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 4 & at 4 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 4 & at 5 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 4 & at 6 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 4 & at 7 with value y_hw = 1.84693, should be y_sw = 1.91562 And Error = 0.0686938
+At 4 & at 8 with value y_hw = 2.1302, should be y_sw = 1.99465 And Error = -0.135553
+At 5 & at 0 with value y_hw = 2.66284, should be y_sw = 2.66284 And Error = 0
+At 5 & at 1 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 5 & at 2 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 5 & at 3 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 5 & at 4 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 5 & at 5 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 5 & at 6 with value y_hw = 1.84693, should be y_sw = 1.91562 And Error = 0.0686938
+At 5 & at 7 with value y_hw = 2.1302, should be y_sw = 1.99465 And Error = -0.135553
+At 5 & at 8 with value y_hw = 1.96117, should be y_sw = 2.18131 And Error = 0.220137
+At 6 & at 0 with value y_hw = 2.53736, should be y_sw = 2.53736 And Error = 0
+At 6 & at 1 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 6 & at 2 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 6 & at 3 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 6 & at 4 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 6 & at 5 with value y_hw = 1.84693, should be y_sw = 1.91562 And Error = 0.0686938
+At 6 & at 6 with value y_hw = 2.1302, should be y_sw = 1.99465 And Error = -0.135553
+At 6 & at 7 with value y_hw = 1.96117, should be y_sw = 2.18131 And Error = 0.220137
+At 6 & at 8 with value y_hw = 2.33414, should be y_sw = 2.3436 And Error = 0.00946021
+At 7 & at 0 with value y_hw = 2.17919, should be y_sw = 2.17919 And Error = 0
+At 7 & at 1 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 7 & at 2 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 7 & at 3 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 7 & at 4 with value y_hw = 1.84693, should be y_sw = 1.91562 And Error = 0.0686938
+At 7 & at 5 with value y_hw = 2.1302, should be y_sw = 1.99465 And Error = -0.135553
+At 7 & at 6 with value y_hw = 1.96117, should be y_sw = 2.18131 And Error = 0.220137
+At 7 & at 7 with value y_hw = 2.33414, should be y_sw = 2.3436 And Error = 0.00946021
+At 7 & at 8 with value y_hw = 2.86004, should be y_sw = 2.70726 And Error = -0.152785
+At 8 & at 0 with value y_hw = 1.94618, should be y_sw = 1.94618 And Error = 0
+At 8 & at 1 with value y_hw = 1.8813, should be y_sw = 1.8813 And Error = 0
+At 8 & at 2 with value y_hw = 1.84211, should be y_sw = 1.84211 And Error = 0
+At 8 & at 3 with value y_hw = 1.84693, should be y_sw = 1.91562 And Error = 0.0686938
+At 8 & at 4 with value y_hw = 2.1302, should be y_sw = 1.99465 And Error = -0.135553
+At 8 & at 5 with value y_hw = 1.96117, should be y_sw = 2.18131 And Error = 0.220137
+At 8 & at 6 with value y_hw = 2.33414, should be y_sw = 2.3436 And Error = 0.00946021
+At 8 & at 7 with value y_hw = 2.86004, should be y_sw = 2.70726 And Error = -0.152785
+At 8 & at 8 with value y_hw = 2.36943, should be y_sw = 2.40992 And Error = 0.0404809
+TEST PASSED
+INFO: [SIM 1] CSim done with 0 errors.
+INFO: [SIM 3] *************** CSIM finish ***************
