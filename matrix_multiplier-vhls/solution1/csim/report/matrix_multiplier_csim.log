@@ -1,7 +1,6 @@
 INFO: [SIM 2] *************** CSIM start ***************
 INFO: [SIM 4] CSIM will launch GCC as the compiler.
    Compiling ../../../matrix_multiplier_tb.cpp in debug mode
-   Compiling ../../../matrix_multiplier.cpp in debug mode
    Generating csim.exe
 Print Matrix A:
 0.00125126	0.563585	0.193304	0.80874	0.585009	0.479873	0.350291	0.895962	0.82284	

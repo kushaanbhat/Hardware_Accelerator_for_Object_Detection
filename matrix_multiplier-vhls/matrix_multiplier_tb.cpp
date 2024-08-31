@@ -57,9 +57,9 @@ int main() {
     int match = 0;
     for (unsigned int i = 0; i < m; i++) {
         	for (unsigned int j = 0; j < m; j++){
-        		if(y_sw[i+j] != y_sw[i+j]){
+        		if(((y_sw[i+j] - y_hw[i+j])>=0.5) || ((y_sw[i+j] - y_hw[i+j])<=-0.5)){
         			match = 1;
-        			std::cout <<"Error at " << i<<" & at " << j << " with value y_hw = " << y_hw[i] << ", should be y_sw = " << y_sw[i]
+        			std::cout <<"Error at " << i<<" & at " << j << " with value y_hw = " << y_hw[i] << ", should be y_sw = " << y_sw[i]<<"Value of Match = "<<match
         			  					  << std::endl;
         		}
         		else{
@@ -71,6 +71,6 @@ int main() {
 
 
     std::cout << "TEST " << (match ? "FAILED" : "PASSED") << std::endl;
-    return 0;
+    return match;
 
 }

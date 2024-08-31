@@ -1,4 +1,4 @@
-<project xmlns="com.autoesl.autopilot.project" top="matrix_multiplier" name="matrix_multiplier-vhls" projectType="C/C++">
+<project xmlns="com.autoesl.autopilot.project" name="matrix_multiplier-vhls" top="matrix_multiplier" projectType="C/C++">
     <includePaths/>
     <libraryPaths/>
     <Simulation>
