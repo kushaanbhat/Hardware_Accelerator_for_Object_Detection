@@ -8,6 +8,8 @@
 #include <cmath> // For ReLU and other operations
 #include <cfloat>
 
+using namespace std;
+
 
 
 // Function to read input data from AXI stream
@@ -31,13 +33,26 @@ void write_output(axi_stream &output_stream, float output[FC2_OUTPUT]) {
         temp.data = output[i];
         output_stream.write(temp);
     }
+    cout<<"Out"<<endl;
+    for (int i = 0; i < FC2_OUTPUT; i++) {
+    	cout << output[i] << endl;
+    }
+    float maxVal = output[0];
+    int maxID = 0;
+    for (int i = 1; i < FC2_OUTPUT; i++) {
+    	if (output[i] > maxVal) {
+    		maxVal = output[i];
+    		maxID = i;
+    	}
+    }
+    cout << "Maximum value of Dense Layer 2 is : " << maxVal << " for Class Id :" << maxID << endl;
 }
 
 // Convolution Layer 1 (Conv2D with 32 filters of size 5x5)
-void conv2d_1(float input[30][30][3], float output[26][26][32]) {
-    for (int f = 0; f < 32; f++) {
-        for (int i = 0; i < 26; i++) {
-            for (int j = 0; j < 26; j++) {
+void conv2d_1(float input[c1_w_in][c1_l_in][c1_d_in], float conv1_output[c1_w_out][c1_l_out][c1_d_out]) {
+    for (int f = 0; f < c1_d_out; f++) {
+        for (int i = 0; i < c1_l_out; i++) {
+            for (int j = 0; j < c1_w_out; j++) {
                 #pragma HLS PIPELINE
                 float sum = conv1_biases[f];
                 for (int c = 0; c < 3; c++) {
@@ -47,14 +62,14 @@ void conv2d_1(float input[30][30][3], float output[26][26][32]) {
                         }
                     }
                 }
-                output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
+                conv1_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
             }
         }
     }
 }
 
 // Convolution Layer 2
-void conv2d_2(float input[26][26][32], float output[22][22][32]) {
+void conv2d_2(float conv1_output[c2_w_in][c2_l_in][c2_d_in], float conv2_output[c2_w_out][c2_l_out][c2_d_out]) {
     for (int f = 0; f < 32; f++) {
         for (int i = 0; i < 22; i++) {
             for (int j = 0; j < 22; j++) {
@@ -63,18 +78,18 @@ void conv2d_2(float input[26][26][32], float output[22][22][32]) {
                 for (int c = 0; c < 32; c++) {
                     for (int ki = 0; ki < 5; ki++) {
                         for (int kj = 0; kj < 5; kj++) {
-                            sum += input[i + ki][j + kj][c] * conv2_weights[f][c][ki][kj];
+                            sum += conv1_output[i + ki][j + kj][c] * conv2_weights[f][c][ki][kj];
                         }
                     }
                 }
-                output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
+                conv2_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
             }
         }
     }
 }
 
 // Max Pooling Layer 1 (2x2)
-void maxpool2d_1(float input[22][22][32], float output[11][11][32]) {
+void maxpool2d_1(float conv2_output[mp1_w_in][mp1_l_in][mp1_d_in], float maxpool1_output[mp1_w_out][mp1_l_out][mp1_d_out]) {
     for (int f = 0; f < 32; f++) {
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 11; j++) {
@@ -82,17 +97,17 @@ void maxpool2d_1(float input[22][22][32], float output[11][11][32]) {
                 float max_val = -FLT_MAX;
                 for (int ki = 0; ki < 2; ki++) {
                     for (int kj = 0; kj < 2; kj++) {
-                        max_val = fmaxf(max_val, input[2 * i + ki][2 * j + kj][f]);
+                        max_val = fmaxf(max_val, conv2_output[2 * i + ki][2 * j + kj][f]);
                     }
                 }
-                output[i][j][f] = max_val;
+                maxpool1_output[i][j][f] = max_val;
             }
         }
     }
 }
 
 // Convolution Layer 3 (64 filters of size 3x3)
-void conv2d_3(float input[11][11][32], float output[9][9][64]) {
+void conv2d_3(float maxpool1_output[c3_w_in][c3_l_in][c3_d_in], float conv3_output[c3_w_out][c3_l_out][c3_d_out]) {
     for (int f = 0; f < 64; f++) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -101,18 +116,18 @@ void conv2d_3(float input[11][11][32], float output[9][9][64]) {
                 for (int c = 0; c < 32; c++) {
                     for (int ki = 0; ki < 3; ki++) {
                         for (int kj = 0; kj < 3; kj++) {
-                            sum += input[i + ki][j + kj][c] * conv3_weights[f][c][ki][kj];
+                            sum += maxpool1_output[i + ki][j + kj][c] * conv3_weights[f][c][ki][kj];
                         }
                     }
                 }
-                output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
+                conv3_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
             }
         }
     }
 }
 
 // Convolution Layer 4 (64 filters of size 3x3)
-void conv2d_4(float input[9][9][64], float output[7][7][64]) {
+void conv2d_4(float conv3_output[c4_w_in][c4_l_in][c4_d_in], float conv4_output[c4_w_out][c4_l_out][c4_d_out]) {
     for (int f = 0; f < 64; f++) {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
@@ -121,18 +136,18 @@ void conv2d_4(float input[9][9][64], float output[7][7][64]) {
                 for (int c = 0; c < 64; c++) {
                     for (int ki = 0; ki < 3; ki++) {
                         for (int kj = 0; kj < 3; kj++) {
-                            sum += input[i + ki][j + kj][c] * conv4_weights[f][c][ki][kj];
+                            sum += conv3_output[i + ki][j + kj][c] * conv4_weights[f][c][ki][kj];
                         }
                     }
                 }
-                output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
+                conv4_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
             }
         }
     }
 }
 
 // Max Pooling Layer 2
-void maxpool2d_2(float input[7][7][64], float output[3][3][64]) {
+void maxpool2d_2(float conv4_output[mp2_w_in][mp2_l_in][mp2_d_in], float maxpool2_output[mp2_w_out][mp2_l_out][mp2_d_out]) {
     for (int f = 0; f < 64; f++) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -140,46 +155,46 @@ void maxpool2d_2(float input[7][7][64], float output[3][3][64]) {
                 float max_val = -FLT_MAX;
                 for (int ki = 0; ki < 2; ki++) {
                     for (int kj = 0; kj < 2; kj++) {
-                        max_val = fmaxf(max_val, input[2 * i + ki][2 * j + kj][f]);
+                        max_val = fmaxf(max_val, conv4_output[2 * i + ki][2 * j + kj][f]);
                     }
                 }
-                output[i][j][f] = max_val;
+                maxpool2_output[i][j][f] = max_val;
             }
         }
     }
 }
 
 // Flatten Layer
-void flatten(float input[3][3][64], float output[576]) {
+void flatten(float maxpool2_output[f_w_in][f_l_in][f_d_in], float flat_output[f_out]) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             for (int f = 0; f < 64; f++) {
                 #pragma HLS PIPELINE
-                output[i * 3 * 64 + j * 64 + f] = input[i][j][f];
+            	flat_output[i * 3 * 64 + j * 64 + f] = maxpool2_output[i][j][f];
             }
         }
     }
 }
 
 // Dense Layer 1
-void dense_1(float input[576], float output[256]) {
+void dense_1(float flat_output[d1_in], float dense1_output[d1_out]) {
     for (int i = 0; i < 256; i++) {
         #pragma HLS PIPELINE
         float sum = fc1_biases[i];
         for (int j = 0; j < 576; j++) {
-            sum += input[j] * fc1_weights[i][j];
+            sum += flat_output[j] * fc1_weights[i][j];
         }
-        output[i] = fmaxf(0.0f, sum); // ReLU Activation
+        dense1_output[i] = fmaxf(0.0f, sum); // ReLU Activation
     }
 }
 
 // Dense Layer 2
-void dense_2(float input[256], float output[43]) {
+void dense_2(float dense1_output[d2_in], float output[d2_out]) {
     for (int i = 0; i < 43; i++) {
         #pragma HLS PIPELINE
         float sum = fc2_biases[i];
         for (int j = 0; j < 256; j++) {
-            sum += input[j] * fc2_weights[i][j];
+            sum += dense1_output[j] * fc2_weights[i][j];
         }
         output[i] = sum; // No activation, final output is logits
     }
