@@ -10,8 +10,6 @@
 
 using namespace std;
 
-
-
 // Function to read input data from AXI stream
 void read_input(axi_stream &input_stream, float input[INPUT_HEIGHT][INPUT_WIDTH][INPUT_CHANNELS]) {
     for (int i = 0; i < INPUT_HEIGHT; i++) {
@@ -201,10 +199,14 @@ void dense_2(float dense1_output[d2_in], float output[d2_out]) {
 }
 
 // The CNN forward function, calling all layers in sequence
-void cnn(axi_stream &input_stream, axi_stream &output_stream) {
+int cnn(axi_stream &input_stream, axi_stream &output_stream) {
 #pragma HLS INTERFACE axis port=input_stream
     #pragma HLS INTERFACE axis port=output_stream
     #pragma HLS INTERFACE ap_ctrl_none port=return
+
+    if (input_stream.empty()) {
+        return -1; // Error: input stream is empty
+    }
 
     float input[30][30][3];
     read_input(input_stream, input);
@@ -237,4 +239,11 @@ void cnn(axi_stream &input_stream, axi_stream &output_stream) {
     dense_2(dense1_output, dense2_output);
 
     write_output(output_stream, dense2_output);
+
+    // Verify the correctness of the output stream
+    if (output_stream.empty()) {
+        return -2; // Error: output stream is empty
+    }
+
+    return 0; // Success
 }

@@ -5,7 +5,7 @@ void matrix_multiplier( float *A, float *x, float *y, unsigned m) {
 	  float x_local[M_MAX];
 
 		L1: for (int i = 0; i < m; i++) {
-			L2: for (int j = 0; j < m; i++) {
+			L2: for (int j = 0; j < m; j++) {
 				x_local[i+j] = x[i+j];
 			}
 		}
