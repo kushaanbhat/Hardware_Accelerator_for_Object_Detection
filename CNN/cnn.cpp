@@ -5,49 +5,88 @@
 #include "conv4.h"
 #include "dense1.h"
 #include "dense2.h"
-#include <cmath> // For ReLU and other operations
+#include <cmath> // For ReLU, softmax, and other operations
 #include <cfloat>
+#include <iostream> // For debugging output
+#include <fstream>  // For saving outputs to files
 
 using namespace std;
 
-
-
-// Function to read input data from AXI stream
+// Function to read input data from AXI stream and normalize
 void read_input(axi_stream &input_stream, float input[INPUT_HEIGHT][INPUT_WIDTH][INPUT_CHANNELS]) {
     for (int i = 0; i < INPUT_HEIGHT; i++) {
         for (int j = 0; j < INPUT_WIDTH; j++) {
             for (int c = 0; c < INPUT_CHANNELS; c++) {
                 #pragma HLS PIPELINE
-                axi_t temp = input_stream.read();
-                input[i][j][c] = temp.data;
+            	fixed_t temp = input_stream.read();
+                input[i][j][c] = temp; // Normalize pixel values
             }
         }
     }
 }
 
-// Function to write output data to AXI stream
-void write_output(axi_stream &output_stream, float output[FC2_OUTPUT]) {
+/*void save_layer_output(const char* filename, float* output, int size) {
+    ofstream file(filename);
+    for (int i = 0; i < size; i++) {
+        file << output[i] << "\n";
+    }
+    file.close();
+}*/
+
+// Function to print and save layer outputs
+/*void print_and_save_output(const char* layer_name, float* output, int size) {
+    cout << "\n" << layer_name << " output (first 10 values):\n";
+    for (int i = 0; i < min(10, size); i++) {
+        cout << output[i] << " ";
+    }
+    cout << "\n";
+    save_layer_output(layer_name, output, size);
+}*/
+
+/*// Function to print layer outputs for debugging
+void print_layer_output(const char* layer_name, float* output, int size) {
+    cout << "\n" << layer_name << " output:\n";
+    for (int i = 0; i < size; i++) {
+        cout << output[i] << " ";
+    }
+    cout << "\n" << endl;
+}*/
+
+
+// Softmax function to normalize final layer outputs
+void softmax(float input[FC2_OUTPUT], float output[FC2_OUTPUT]) {
+    float sum_exp = 0;
     for (int i = 0; i < FC2_OUTPUT; i++) {
-        #pragma HLS PIPELINE
-        axi_t temp;
-        temp.data = output[i];
-        output_stream.write(temp);
+        output[i] = exp(input[i]);
+        sum_exp += output[i];
     }
-    cout<<"Out"<<endl;
     for (int i = 0; i < FC2_OUTPUT; i++) {
-    	cout << output[i] << endl;
+        output[i] /= sum_exp;
     }
-    float maxVal = output[0];
-    int maxID = 0;
-    for (int i = 1; i < FC2_OUTPUT; i++) {
-    	if (output[i] > maxVal) {
-    		maxVal = output[i];
-    		maxID = i;
-    	}
-    }
-    cout << "Maximum value of Dense Layer 2 is : " << maxVal << " for Class Id :" << maxID << endl;
 }
 
+// Function to write output data to AXI stream with softmax
+void write_output(axi_stream &output_stream, float output[FC2_OUTPUT]) {
+    float softmax_output[FC2_OUTPUT];
+    softmax(output, softmax_output);
+
+    for (int i = 0; i < FC2_OUTPUT; i++) {
+        #pragma HLS PIPELINE
+        fixed_t temp;
+        temp = softmax_output[i];
+        output_stream.write(temp);
+    }
+
+    float maxVal = softmax_output[0];
+    int maxID = 0;
+    for (int i = 1; i < FC2_OUTPUT; i++) {
+        if (softmax_output[i] > maxVal) {
+            maxVal = softmax_output[i];
+            maxID = i;
+        }
+    }
+    cout << "\nMaximum probability: " << maxVal << " for Class ID: " << maxID << "\n" << endl;
+}
 // Convolution Layer 1 (Conv2D with 32 filters of size 5x5)
 void conv2d_1(float input[c1_w_in][c1_l_in][c1_d_in], float conv1_output[c1_w_out][c1_l_out][c1_d_out]) {
     for (int f = 0; f < c1_d_out; f++) {
@@ -211,30 +250,39 @@ void cnn(axi_stream &input_stream, axi_stream &output_stream) {
 
     float conv1_output[26][26][32];
     conv2d_1(input, conv1_output);
+    //print_and_save_output("hls_conv2d_1.csv", &conv1_output[0][0][0], c1_w_out * c1_l_out * c1_d_out);
 
     float conv2_output[22][22][32];
     conv2d_2(conv1_output, conv2_output);
+    //print_and_save_output("hls_conv2d_2.csv", &conv2_output[0][0][0], c2_w_out * c2_l_out * c2_d_out);
 
     float maxpool1_output[11][11][32];
     maxpool2d_1(conv2_output, maxpool1_output);
+    //print_and_save_output("hls_maxpool2d_1.csv", &maxpool1_output[0][0][0], mp1_w_out * mp1_l_out * mp1_d_out);
 
     float conv3_output[9][9][64];
     conv2d_3(maxpool1_output, conv3_output);
+    //print_and_save_output("hls_conv2d_3.csv", &conv3_output[0][0][0], c3_w_out * c3_l_out * c3_d_out);
 
     float conv4_output[7][7][64];
     conv2d_4(conv3_output, conv4_output);
+    //print_and_save_output("hls_conv2d_4.csv", &conv4_output[0][0][0], c4_w_out * c4_l_out * c4_d_out);
 
     float maxpool2_output[3][3][64];
     maxpool2d_2(conv4_output, maxpool2_output);
+    //print_and_save_output("hls_maxpool2d_2.csv", &maxpool2_output[0][0][0], mp2_w_out * mp2_l_out * mp2_d_out);
 
     float flat_output[576];
     flatten(maxpool2_output, flat_output);
+    //print_and_save_output("hls_flatten.csv", flat_output, f_out);
 
     float dense1_output[256];
     dense_1(flat_output, dense1_output);
+    //print_and_save_output("hls_dense_1.csv", dense1_output, d1_out);
 
     float dense2_output[43];
     dense_2(dense1_output, dense2_output);
+    //print_and_save_output("hls_dense_2.csv", dense2_output, d2_out);
 
     write_output(output_stream, dense2_output);
 }

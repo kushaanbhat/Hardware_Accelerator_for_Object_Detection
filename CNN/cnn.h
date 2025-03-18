@@ -6,8 +6,8 @@
 #include <ap_int.h>
 
 // Define AXI Stream types
-typedef ap_axis<32, 2, 5, 6> axi_t;
-typedef hls::stream<axi_t> axi_stream;
+typedef ap_fixed<16,6> fixed_t;
+typedef hls::stream<fixed_t> axi_stream;
 
 // CNN Layer Specifications
 #define INPUT_WIDTH 30
