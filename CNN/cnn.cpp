@@ -1,4 +1,10 @@
+#include "hls_stream.h"
+#include "ap_axi_sdata.h"
 #include "cnn.h"
+<<<<<<< HEAD
+#include "cnn_weights.h"
+#include <cmath> // For ReLU, softmax, and other operations
+=======
 #include "conv1.h"
 #include "conv2.h"
 #include "conv3.h"
@@ -9,9 +15,32 @@
 #include <cfloat>
 #include <iostream> // For debugging output
 #include <fstream>  // For saving outputs to files
+>>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9
 
-using namespace std;
+// HLS CNN Function with AXI Stream Interface
+void cnn(hls::stream<AXI_VAL> &image_in,  hls::stream<AXI_VAL> &predict_class) {
+#pragma HLS INTERFACE mode=axis register_mode=both depth=2700 port=image_in register
+#pragma HLS INTERFACE mode=axis register_mode=both depth=1 port=predict_class register
+#pragma HLS INTERFACE s_axilite port=return
 
+<<<<<<< HEAD
+    // Define input image dimensions
+    float image[img_h][img_w][img_d];
+    float c_out[c_out_h][c_out_w][c_out_d];
+    float m_out[m_out_h][m_out_w][m_out_d];
+    float f_out[f_out_h];
+    float d_out[d_out_h];
+
+
+    // Read input image from AXI stream
+    for (int i = 0; i < img_h; i++) {
+        for (int j = 0; j < img_w; j++) {
+            for (int k = 0; k < img_d; k++) {
+#pragma HLS PIPELINE
+                AXI_VAL temp_image = image_in.read();
+                image[i][j][k] = axi_to_float(temp_image);
+                //image[i][j][k] = image[i][j][k] / 255.0f; // Normalize to [0, 1]
+=======
 // Function to read input data from AXI stream and normalize
 void read_input(axi_stream &input_stream, float input[INPUT_HEIGHT][INPUT_WIDTH][INPUT_CHANNELS]) {
     for (int i = 0; i < INPUT_HEIGHT; i++) {
@@ -20,11 +49,22 @@ void read_input(axi_stream &input_stream, float input[INPUT_HEIGHT][INPUT_WIDTH]
                 #pragma HLS PIPELINE
             	fixed_t temp = input_stream.read();
                 input[i][j][c] = temp; // Normalize pixel values
+>>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9
             }
         }
     }
-}
 
+<<<<<<< HEAD
+    // Conv2D Layer
+    conv2d(image, c_out);
+    // MaxPooling Layer
+    maxpool2d(c_out, m_out);
+    // Flatten Layer
+    flatten(m_out, f_out);
+    // Dense Layer
+    dense(f_out, d_out);
+    float maxVal = d_out[0];
+=======
 /*void save_layer_output(const char* filename, float* output, int size) {
     ofstream file(filename);
     for (int i = 0; i < size; i++) {
@@ -78,7 +118,18 @@ void write_output(axi_stream &output_stream, float output[FC2_OUTPUT]) {
     }
 
     float maxVal = softmax_output[0];
+>>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9
     int maxID = 0;
+<<<<<<< HEAD
+    for (int i = 1; i < d_out_h; i++) {
+    	if (d_out[i] > maxVal) {
+    		maxVal = d_out[i];
+    		maxID = i;
+    	}
+     }
+
+    predict_class.write(float_to_axi(maxID));
+=======
     for (int i = 1; i < FC2_OUTPUT; i++) {
         if (softmax_output[i] > maxVal) {
             maxVal = softmax_output[i];
@@ -106,139 +157,88 @@ void conv2d_1(float input[c1_w_in][c1_l_in][c1_d_in], float conv1_output[c1_w_ou
         }
     }
 }
+>>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9
 
-// Convolution Layer 2
-void conv2d_2(float conv1_output[c2_w_in][c2_l_in][c2_d_in], float conv2_output[c2_w_out][c2_l_out][c2_d_out]) {
-    for (int f = 0; f < 32; f++) {
-        for (int i = 0; i < 22; i++) {
-            for (int j = 0; j < 22; j++) {
+/*
+    // Write the result matrix to AXI stream
+    for (int k = 0; k < m_out_d; k++) {
+    	for (int i = 0; i < m_out_h; i++) {
+    		for (int j = 0; j < m_out_w; j++) {
+#pragma HLS PIPELINE
+                image_out.write(float_to_axi(m_out[i][j][k]));
+            }
+        }
+    }
+    */
+}
+
+// Conv2D Layer Definition
+void conv2d(float image[img_h][img_w][img_d], float c_out[c_out_h][c_out_w][c_out_d]) {
+
+    for (int f = 0; f < c_out_d; f++) {
+        for (int i = 0; i < c_out_h; i++) {
+            for (int j = 0; j < c_out_w; j++) {
                 #pragma HLS PIPELINE
-                float sum = conv2_biases[f];
-                for (int c = 0; c < 32; c++) {
-                    for (int ki = 0; ki < 5; ki++) {
-                        for (int kj = 0; kj < 5; kj++) {
-                            sum += conv1_output[i + ki][j + kj][c] * conv2_weights[f][c][ki][kj];
+                float sum = biases[f];
+                for (int c = 0; c < img_d; c++) {
+                    for (int ki = 0; ki < w_1_h; ki++) {
+                        for (int kj = 0; kj < w_1_w; kj++) {
+                                sum += image[i+ki][j+kj][c] * weight[ki][kj][c][f];
                         }
                     }
                 }
-                conv2_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
+                c_out[i][j][f] = (sum > 0) ? sum : 0; // ReLU Activation
             }
         }
     }
 }
 
-// Max Pooling Layer 1 (2x2)
-void maxpool2d_1(float conv2_output[mp1_w_in][mp1_l_in][mp1_d_in], float maxpool1_output[mp1_w_out][mp1_l_out][mp1_d_out]) {
-    for (int f = 0; f < 32; f++) {
-        for (int i = 0; i < 11; i++) {
-            for (int j = 0; j < 11; j++) {
-                #pragma HLS PIPELINE
+
+// Max Pooling Layer Definition
+void maxpool2d(float c_out[c_out_h][c_out_w][c_out_d], float m_out[m_out_h][m_out_w][m_out_d]) {
+    for (int f = 0; f < m_out_d; f++) {
+        for (int i = 0; i < m_out_h; i++) {
+            for (int j = 0; j < m_out_w; j++) {
+#pragma HLS PIPELINE
                 float max_val = -FLT_MAX;
                 for (int ki = 0; ki < 2; ki++) {
                     for (int kj = 0; kj < 2; kj++) {
-                        max_val = fmaxf(max_val, conv2_output[2 * i + ki][2 * j + kj][f]);
+                        max_val = fmaxf(max_val, c_out[2 * i + ki][2 * j + kj][f]);
                     }
                 }
-                maxpool1_output[i][j][f] = max_val;
+                m_out[i][j][f] = max_val;
             }
         }
     }
 }
 
-// Convolution Layer 3 (64 filters of size 3x3)
-void conv2d_3(float maxpool1_output[c3_w_in][c3_l_in][c3_d_in], float conv3_output[c3_w_out][c3_l_out][c3_d_out]) {
-    for (int f = 0; f < 64; f++) {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                #pragma HLS PIPELINE
-                float sum = conv3_biases[f];
-                for (int c = 0; c < 32; c++) {
-                    for (int ki = 0; ki < 3; ki++) {
-                        for (int kj = 0; kj < 3; kj++) {
-                            sum += maxpool1_output[i + ki][j + kj][c] * conv3_weights[f][c][ki][kj];
-                        }
-                    }
-                }
-                conv3_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
+// Flatten Layer Definition
+void flatten(float m_out[m_out_h][m_out_w][m_out_d], float f_out[f_out_h]) {
+    for (int i = 0; i < m_out_h; i++) {
+        for (int j = 0; j < m_out_w; j++) {
+            for (int f = 0; f < m_out_d; f++) {
+#pragma HLS PIPELINE
+            	f_out[i * m_out_h * m_out_d + j * m_out_d + f] = m_out[i][j][f];
             }
         }
     }
 }
 
-// Convolution Layer 4 (64 filters of size 3x3)
-void conv2d_4(float conv3_output[c4_w_in][c4_l_in][c4_d_in], float conv4_output[c4_w_out][c4_l_out][c4_d_out]) {
-    for (int f = 0; f < 64; f++) {
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-                #pragma HLS PIPELINE
-                float sum = conv4_biases[f];
-                for (int c = 0; c < 64; c++) {
-                    for (int ki = 0; ki < 3; ki++) {
-                        for (int kj = 0; kj < 3; kj++) {
-                            sum += conv3_output[i + ki][j + kj][c] * conv4_weights[f][c][ki][kj];
-                        }
-                    }
-                }
-                conv4_output[i][j][f] = fmaxf(0.0f, sum); // ReLU Activation
-            }
+
+// Dense Layer Definition
+void dense(float f_out[f_out_h], float d_out[d_out_h]) {
+    for (int i = 0; i < d_out_h; i++) {
+#pragma HLS UNROLL
+        float sum = dense_biases[i];
+        for (int j = 0; j < f_out_h; j++) {
+            sum += f_out[j] * dense_weights[j][i];
         }
+        d_out[i] = fmaxf(0.0f, sum); // ReLU Activation
     }
 }
 
-// Max Pooling Layer 2
-void maxpool2d_2(float conv4_output[mp2_w_in][mp2_l_in][mp2_d_in], float maxpool2_output[mp2_w_out][mp2_l_out][mp2_d_out]) {
-    for (int f = 0; f < 64; f++) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                #pragma HLS PIPELINE
-                float max_val = -FLT_MAX;
-                for (int ki = 0; ki < 2; ki++) {
-                    for (int kj = 0; kj < 2; kj++) {
-                        max_val = fmaxf(max_val, conv4_output[2 * i + ki][2 * j + kj][f]);
-                    }
-                }
-                maxpool2_output[i][j][f] = max_val;
-            }
-        }
-    }
-}
-
-// Flatten Layer
-void flatten(float maxpool2_output[f_w_in][f_l_in][f_d_in], float flat_output[f_out]) {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            for (int f = 0; f < 64; f++) {
-                #pragma HLS PIPELINE
-            	flat_output[i * 3 * 64 + j * 64 + f] = maxpool2_output[i][j][f];
-            }
-        }
-    }
-}
-
-// Dense Layer 1
-void dense_1(float flat_output[d1_in], float dense1_output[d1_out]) {
-    for (int i = 0; i < 256; i++) {
-        #pragma HLS PIPELINE
-        float sum = fc1_biases[i];
-        for (int j = 0; j < 576; j++) {
-            sum += flat_output[j] * fc1_weights[i][j];
-        }
-        dense1_output[i] = fmaxf(0.0f, sum); // ReLU Activation
-    }
-}
-
-// Dense Layer 2
-void dense_2(float dense1_output[d2_in], float output[d2_out]) {
-    for (int i = 0; i < 43; i++) {
-        #pragma HLS PIPELINE
-        float sum = fc2_biases[i];
-        for (int j = 0; j < 256; j++) {
-            sum += dense1_output[j] * fc2_weights[i][j];
-        }
-        output[i] = sum; // No activation, final output is logits
-    }
-}
-
+<<<<<<< HEAD
+=======
 // The CNN forward function, calling all layers in sequence
 void cnn(axi_stream &input_stream, axi_stream &output_stream) {
 #pragma HLS INTERFACE axis port=input_stream
@@ -286,3 +286,5 @@ void cnn(axi_stream &input_stream, axi_stream &output_stream) {
 
     write_output(output_stream, dense2_output);
 }
+
+>>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9

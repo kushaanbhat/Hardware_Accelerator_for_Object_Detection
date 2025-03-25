@@ -1,114 +1,60 @@
-#ifndef CNN_H
-#define CNN_H
-#include "iostream"
-#include <hls_stream.h>
-#include <ap_axi_sdata.h>
-#include <ap_int.h>
+#ifndef _CNN_H_
+#define _CNN_H_
 
+<<<<<<< HEAD
+#include "ap_axi_sdata.h"
+=======
 // Define AXI Stream types
 typedef ap_fixed<16,6> fixed_t;
 typedef hls::stream<fixed_t> axi_stream;
+>>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9
 
-// CNN Layer Specifications
-#define INPUT_WIDTH 30
-#define INPUT_HEIGHT 30
-#define INPUT_CHANNELS 3
+#define img_h 30
+#define img_w 30
+#define img_d 3
 
-#define CONV1_FILTERS 32
-#define CONV2_FILTERS 32
-#define CONV3_FILTERS 64
-#define CONV4_FILTERS 64
+#define w_1_h 3
+#define w_1_w 3
+#define w_1_d 32
 
-#define KERNEL_SIZE_5x5 5
-#define KERNEL_SIZE_3x3 3
-#define POOL_SIZE 2
+#define c_out_h 28
+#define c_out_w 28
+#define c_out_d 32
 
-#define FC1_OUTPUT 256
-#define FC2_OUTPUT 43
+#define FLT_MAX 3.402823466e+38F
 
-#define c1_w_in INPUT_WIDTH
-#define c1_l_in INPUT_HEIGHT
-#define c1_d_in INPUT_CHANNELS
+#define m_out_h 14
+#define m_out_w 14
+#define m_out_d 32
 
-#define c1_w_out (INPUT_WIDTH-KERNEL_SIZE_5x5+1)
-#define c1_l_out (INPUT_HEIGHT-KERNEL_SIZE_5x5+1)
-#define c1_d_out CONV1_FILTERS
+#define f_out_h 6272
+
+#define d_out_h 43
 
 
-#define c2_w_in (INPUT_WIDTH-KERNEL_SIZE_5x5+1)
-#define c2_l_in (INPUT_HEIGHT-KERNEL_SIZE_5x5+1)
-#define c2_d_in CONV1_FILTERS
+// Define AXI interface type (32-bit float data)
+typedef ap_axiu<32, 0, 0, 0> AXI_VAL;
 
-#define c2_w_out ((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)
-#define c2_l_out ((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)
-#define c2_d_out CONV2_FILTERS
+// AXI Interface to Floating-point conversion helper function
+inline float axi_to_float(AXI_VAL &input) {
+    union { unsigned int i; float f; } converter;
+    converter.i = input.data;
+    return converter.f;
+}
 
+// Floating-point to AXI Interface conversion helper function
+inline AXI_VAL float_to_axi(float val) {
+    AXI_VAL output;
+    union { unsigned int i; float f; } converter;
+    converter.f = val;
+    output.data = converter.i;
+    output.last = 0;
+    return output;
+}
 
-#define mp1_w_in ((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)
-#define mp1_l_in ((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)
-#define mp1_d_in CONV2_FILTERS
-
-#define mp1_w_out (((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)
-#define mp1_l_out (((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)
-#define mp1_d_out CONV2_FILTERS
-
-
-#define c3_w_in (((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)
-#define c3_l_in (((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)
-#define c3_d_in CONV2_FILTERS
-
-#define c3_w_out ((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)
-#define c3_l_out ((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)
-#define c3_d_out CONV3_FILTERS
-
-
-#define c4_w_in ((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)
-#define c4_l_in ((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)
-#define c4_d_in CONV3_FILTERS
-
-#define c4_w_out (((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)
-#define c4_l_out (((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)
-#define c4_d_out CONV4_FILTERS
-
-
-#define mp2_w_in (((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)
-#define mp2_l_in (((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)
-#define mp2_d_in CONV4_FILTERS
-
-#define mp2_w_out ((((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)
-#define mp2_l_out ((((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)
-#define mp2_d_out CONV4_FILTERS
-
-
-#define f_w_in ((((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)
-#define f_l_in ((((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)
-#define f_d_in CONV4_FILTERS
-
-#define f_out ((((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)*((((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)*CONV4_FILTERS
-
-#define d1_in ((((((INPUT_WIDTH-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)*((((((INPUT_HEIGHT-KERNEL_SIZE_5x5+1)-KERNEL_SIZE_5x5+1)/2)-KERNEL_SIZE_3x3+1)-KERNEL_SIZE_3x3+1)/2)*CONV4_FILTERS
-
-#define d1_out FC1_OUTPUT
-
-
-#define d2_in FC1_OUTPUT
-
-#define d2_out FC2_OUTPUT
-
-// Function Prototypes
-void cnn(axi_stream &input_stream, axi_stream &output_stream);
-
-// Layer functions
-void read_input(axi_stream &input_stream, float input[INPUT_HEIGHT][INPUT_WIDTH][INPUT_CHANNELS]);
-void write_output(axi_stream &output_stream, float output[FC2_OUTPUT]);
-void conv2d_1(float input[c1_w_in][c1_l_in][c1_d_in], float output[c1_w_out][c1_l_out][c1_d_out]);
-void conv2d_2(float input[c2_w_in][c2_l_in][c2_d_in], float output[c2_w_out][c2_l_out][c2_d_out]);
-void maxpool2d_1(float input[mp1_w_in][mp1_l_in][mp1_d_in], float output[mp1_w_out][mp1_l_out][mp1_d_out]);
-void conv2d_3(float input[c3_w_in][c3_l_in][c3_d_in], float output[c3_w_out][c3_l_out][c3_d_out]);
-void conv2d_4(float input[c4_w_in][c4_l_in][c4_d_in], float output[c4_w_out][c4_l_out][c4_d_out]);
-void maxpool2d_2(float input[mp2_w_in][mp2_l_in][mp2_d_in], float output[mp2_w_out][mp2_l_out][mp2_d_out]);
-void flatten(float input[f_w_in][f_l_in][f_d_in], float output[f_out]);
-void dense_1(float input[d1_in], float output[d1_out]);
-void dense_2(float input[d2_in], float output[d2_out]);
+void conv2d( float image[img_h][img_w][img_d],float c_out_1[c_out_h][c_out_w][c_out_d]);
+void maxpool2d(float c_out[c_out_h][c_out_w][c_out_d], float m_out[m_out_h][m_out_w][m_out_d]);
+void flatten(float m_out[m_out_h][m_out_w][m_out_d], float f_out[f_out_h]);
+void dense(float f_out[f_out_h], float d_out[d_out_h]);
 
 #endif
