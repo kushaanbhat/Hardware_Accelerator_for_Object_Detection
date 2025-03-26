@@ -1,13 +1,7 @@
 #ifndef _CNN_H_
 #define _CNN_H_
 
-<<<<<<< HEAD
 #include "ap_axi_sdata.h"
-=======
-// Define AXI Stream types
-typedef ap_fixed<16,6> fixed_t;
-typedef hls::stream<fixed_t> axi_stream;
->>>>>>> 230aa7bf74dbbd213528fd1a18ff58b0c6c4fdf9
 
 #define img_h 30
 #define img_w 30
