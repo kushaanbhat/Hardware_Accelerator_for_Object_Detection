@@ -1,7 +1,7 @@
 #include "hls_stream.h"
 #include "ap_axi_sdata.h"
 #include <iostream>
-#include "cnn.h"
+#include "dataTypes.h"
 #include <iomanip>
 
 using namespace std;
@@ -10,12 +10,12 @@ using namespace std;
 typedef ap_axiu<32, 0, 0, 0> AXI_VAL;
 
 // Prototype of the matrix multiplication function (from your HLS code)
-void cnn(hls::stream<AXI_VAL> &image_in, hls::stream<AXI_VAL> &predict_probability, hls::stream<AXI_VAL> &predict_class);
+void cnn(hls::stream<AXI_VAL> &image_in, hls::stream<AXI_VAL> &predict_class);
 
 // Test bench to validate matrix multiplication
 int main() {
     // Declare AXI streams
-    hls::stream<AXI_VAL> image_in, predict_probability, predict_class;
+    hls::stream<AXI_VAL> image_in, predict_class;
     float image[img_h][img_w][img_d] = {
     	    {{80, 78, 75}, {78, 76, 74}, {83, 86, 85}, {85, 93, 105}, {110, 113, 140}, {114, 111, 158}, {119, 119, 186}, {128, 130, 181}, {200, 199, 224}, {246, 242, 251}, {255, 242, 247}, {255, 236, 235}, {221, 191, 183}, {184, 148, 130}, {175, 152, 123}, {181, 182, 158}, {207, 215, 208}, {242, 236, 242}, {246, 233, 245}, {213, 202, 229}, {158, 151, 211}, {99, 97, 177}, {70, 71, 139}, {91, 85, 139}, {107, 97, 120}, {94, 89, 87}, {79, 79, 74}, {74, 74, 68}, {68, 69, 65}, {66, 67, 66}},
     	    {{86, 84, 83}, {82, 80, 80}, {84, 88, 89}, {94, 105, 131}, {119, 129, 182}, {89, 97, 160}, {88, 86, 155}, {162, 147, 194}, {235, 226, 241}, {255, 250, 254}, {255, 252, 250}, {246, 215, 211}, {206, 155, 151}, {197, 143, 140}, {190, 165, 164}, {156, 188, 187}, {167, 213, 209}, {223, 232, 229}, {253, 237, 242}, {250, 225, 245}, {209, 184, 231}, {120, 120, 187}, {68, 81, 148}, {89, 81, 143}, {115, 91, 125}, {104, 90, 100}, {85, 81, 83}, {78, 77, 73}, {75, 78, 76}, {78, 80, 80}},
@@ -58,7 +58,7 @@ int main() {
     }
 
     // Call the matrix multiplication function (this will process the data)
-    cnn(image_in, predict_probability, predict_class);
+    cnn(image_in, predict_class);
 
     //float result[m_out_h][m_out_w][m_out_d];
     float result_probablity, result_class;
@@ -73,9 +73,6 @@ int main() {
         }
     }
 */
-
-    	AXI_VAL temp = predict_probability.read();
-    	result_probablity = axi_to_float(temp);
 
     	AXI_VAL tempa = predict_class.read();
     	result_class = axi_to_float(tempa);

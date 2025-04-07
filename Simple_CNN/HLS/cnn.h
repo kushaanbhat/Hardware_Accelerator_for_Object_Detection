@@ -27,28 +27,12 @@
 
 
 // Define AXI interface type (32-bit float data)
-typedef ap_axiu<32, 0, 0, 0> AXI_VAL;
+typedef ap_axiu<32, 0, 0, 0> AXI_VAL;// 32-bit AXI stream type
+typedef ap_fixed<16, 16> data;   // 16-bit fixed-point with 8 integer bits
 
-// AXI Interface to Floating-point conversion helper function
-inline float axi_to_float(AXI_VAL &input) {
-    union { unsigned int i; float f; } converter;
-    converter.i = input.data;
-    return converter.f;
-}
-
-// Floating-point to AXI Interface conversion helper function
-inline AXI_VAL float_to_axi(float val) {
-    AXI_VAL output;
-    union { unsigned int i; float f; } converter;
-    converter.f = val;
-    output.data = converter.i;
-    output.last = 0;
-    return output;
-}
-
-void conv2d( float image[img_h][img_w][img_d],float c_out_1[c_out_h][c_out_w][c_out_d]);
-void maxpool2d(float c_out[c_out_h][c_out_w][c_out_d], float m_out[m_out_h][m_out_w][m_out_d]);
-void flatten(float m_out[m_out_h][m_out_w][m_out_d], float f_out[f_out_h]);
-void dense(float f_out[f_out_h], float d_out[d_out_h]);
+void conv2d( data image[img_h][img_w][img_d], data c_out_1[c_out_h][c_out_w][c_out_d]);
+void maxpool2d(data c_out[c_out_h][c_out_w][c_out_d], data m_out[m_out_h][m_out_w][m_out_d]);
+void flatten( data m_out[m_out_h][m_out_w][m_out_d], data f_out[f_out_h]);
+void dense( data f_out[f_out_h], data d_out[d_out_h]);
 
 #endif
