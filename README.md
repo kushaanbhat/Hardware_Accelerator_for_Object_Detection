@@ -110,36 +110,3 @@ Based on this implementation, a more complete system could be built:
 3.  **Web Interface:** Develop a web-based interface for controlling the system and visualizing the results.  This would allow users to interact with the system remotely and view the classification results in real-time.
 
 4.  **Training on the edge:** Explore training the CNN directly on the PYNQ platform, potentially using techniques like transfer learning to adapt pre-trained models to specific applications.  This would require significant modifications to the hardware overlay and the Python code.
-
-Here's a proposed system diagram using Mermaid.js:
-
-```mermaid
-graph LR
-    subgraph Host System (PYNQ Board)
-        A[Web Browser]
-        B[Web Server (Flask)]
-        C[Python Application]
-        D[DMA Controller]
-        A --> B
-        B --> C
-        C --> D
-    end
-
-    subgraph FPGA Fabric
-        E[Camera Interface]
-        F[CNN IP Core]
-        G[Memory Buffers]
-        H[DMA Controller]
-        E --> F
-        D --> G
-        G --> F
-        F --> G
-        G --> H
-        H --> C
-    end
-
-    I[Camera] --> E
-
-    style Host System fill:#f9f,stroke:#333,stroke-width:2px
-    style FPGA Fabric fill:#ccf,stroke:#333,stroke-width:2px
-```
