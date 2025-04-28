@@ -115,6 +115,9 @@ Based on this implementation, a more complete system could be built:
 ## Member Details
 
 **Project Guide: Prof. Sagar Mhatre** Mail: sagar.mhatre@somaiya.edu
+
 **Member 1: Kushaan Bhat** Mail: kushaan.bhat@somaiya.edu
+
 **Member 2: Madhav Asawa** Mail: madhav.asawa@somaiya.edu
+
 **Member 3: Vidhan Bhasme** Mail: vidhan.b@somaiya.edu
