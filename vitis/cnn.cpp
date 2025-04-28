@@ -43,14 +43,14 @@ void cnn(hls::stream<AXI_VAL> &image_in, hls::stream<AXI_VAL> &probability_out, 
 			//for (int k = 0; k < m_out_d; k++) {
 #pragma HLS PIPELINE
 		AXI_VAL temp = fixed_to_axi(s_out[i]);
-		temp.last = (i == d_out_h - 1);
+		if (i == d_out_h-1) temp.last = 1; // Set last bit for AXI compliance
 		probability_out.write(temp);
 			//}
 		//}
 	}
-	AXI_VAL class_temp = float_to_axi(MaxID);
-	class_temp.last = 1;
-	class_out.write(class_temp);
+	 AXI_VAL class_val = float_to_axi(MaxID);
+	 class_val.last = 1;
+	 class_out.write(class_val);
 }
 
 // Conv2D Layer Definition
