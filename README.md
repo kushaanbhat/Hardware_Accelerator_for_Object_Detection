@@ -110,3 +110,11 @@ Based on this implementation, a more complete system could be built:
 3.  **Web Interface:** Develop a web-based interface for controlling the system and visualizing the results.  This would allow users to interact with the system remotely and view the classification results in real-time.
 
 4.  **Training on the edge:** Explore training the CNN directly on the PYNQ platform, potentially using techniques like transfer learning to adapt pre-trained models to specific applications.  This would require significant modifications to the hardware overlay and the Python code.
+
+
+## Member Details
+
+**Project Guide: Prof. Sagar Mhatre** Mail: sagar.mhatre@somaiya.edu
+**Member 1: Kushaan Bhat** Mail: kushaan.bhat@somaiya.edu
+**Member 2: Madhav Asawa** Mail: madhav.asawa@somaiya.edu
+**Member 3: Vidhan Bhasme** Mail: vidhan.b@somaiya.edu
